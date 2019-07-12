@@ -1,7 +1,5 @@
 # ECMAScript Infix Bang Syntax: Support for chaining Promises
-Proposed by Mark S. Miller (@erights) and Chip Morningstar (@FUDCo)
-
-Additional text by Michael FIG (@michaelfig)
+By Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael FIG (@michaelfig)
 
 **ECMAScript Infix Bang Syntax: Support for chaining Promises**
 ## Summary
@@ -15,7 +13,7 @@ In contrast to *async*/*await*, infix bang is designed to allow the convenient c
 
 ### Infix Bang
 
-TODO: Is bang inspired by the combination of a dot with a pipe?
+Infix bang (*!*) is a proposed operator with the same precedence as dot (*.*), but cannot begin a new line so that automatic semicolon insertion does not change the interpretation of existing code that has prefix bangs in it without semicolons.
 
 | Syntax	| Expansion	|
 |------- | --- |
@@ -29,7 +27,7 @@ TODO: Is bang inspired by the combination of a dot with a pipe?
 | `delete x ! [i]` |	`Promise.resolve(x).delete(i)` |
 | `delete x ! p`	| `Promise.resolve(x).delete('p')`	|
 
-### Default meaning
+### Default Behaviour
 
 In the absence of *handled Promises* (the **Handler Method** is described in the next section), the above *Promise.prototype* methods have the following behaviour:
 
@@ -43,33 +41,53 @@ In the absence of *handled Promises* (the **Handler Method** is described in the
 
 ### Handled Promises
 
-In a manner analogous to *Proxy* handlers, a *Promise* can be associated with a handler object that provides **Handler Methods** to override its normal unhandled behaviour.  A *handled Promise* is constructed via *Promise.makeHandled()*:
+In a manner analogous to *Proxy* handlers, a *Promise* can be associated with a handler object that provides **Handler Methods** to override its normal unhandled behaviour.  This handler is not exposed to the user of the *handled Promise*, so it provides a barrier between user mode (where the infix bang syntax is used) and system mode (which implements the communication mechanism).
+
+A *handled Promise* is constructed via *Promise.makeHandled()*:
 
 ```js
+//////////////////////
+// Create a handled Promise, whose behaviour queues messages
+// until resolve is called below.
+
+const executorDefault = (resolve, reject) => {
+  // Resolve the promise with target and use the default behaviour.
+  setTimeout(() => resolve('some value'), 3000);
+};
+
+const targetP = Promise.makeHandled(executorDefault);
+
+// These methods can run anytime before or after the targetP is fulfilled.
+// The default handler for makeHandled queues the messages until the fulfill.
+targetP.then(val => assert(val === 'some value'));
+targetP!length.then(len => assert(len === 10));
+targetP!concat(' foobar').then(val => assert(val === 'some value foobar'));
+
+///////////////////////
+// Create a handled Promise that queues messages for a remote slot.
 const handler = {
-  GET(o, prop) { ... },
-  POST(o, prop, args) { ... },
+  GET(o, prop) {
+    return (...args) => queueMessage(slot, prop, args);
+  },
+  POST(o, prop, args) {
+    return queueMessage(slot, prop, args);
+  },
   PUT(o, prop, value) { ... },
   DELETE(o, prop) { ... },
 };
 
-const executor = (resolve, reject) => {
-  // Resolve the promise with target and use the default behaviour.
-  resolve(target);
-  // Resolve the promise with target and associate fulfilledHandler with it.
-  resolve(target, fulfilledHandler); 
+const executorFulfilled = (resolve, reject) => {
+  setTimeout(() => resolve(target, handler), 1000);
+  // Resolve the promise with target and associate handler with it.
 };
 
-// Create a Promise resolving to a target, whose handler queues
-// operations that are replayed when the executor fulfills it.
-const targetP = Promise.makeHandled(executor);
+const targetP = Promise.makeHandled(executorFulfilled, handler);
 
-// Create a Promise resolving to a target, whose handler is
-// unfulfilledHandler until the executor fulfills it.
-const targetP = Promise.makeHandled(executor, unfulfilledHandler);
+targetP!foo(a, b, c) // results in: queueMessage(slot, 'foo', [a, b, c]);
+targetP!foo!(a, b, c) // same
 ```
 
-The default resolve behaviour is to use the same handler that is assigned to `target`, and if there is none, use the default *Promise* behaviour.
+If the *handler* (second argument) is not specified to `resolve`, the handler is the same one that has previously been assigned to `target`, or else as described in the **Default Behaviour** section.
 
 #### Promise Pipelining
 
@@ -120,9 +138,7 @@ Attempted Concrete Syntax:
 
 There is a [shim for the proposed *Promise* API additions](https://github.com/Agoric/eventual-send).
 
-You can experiment with the infix bang syntax desugaring in the [Infix Bang REPL](https://babeljs.io/repl/build/11009/?externalPlugins=babel-plugin-syntax-infix-bang).
-
-The following code fragments are useful for elucidation:
+You can experiment with the infix bang syntax desugaring in the [Infix Bang REPL](https://babeljs.io/repl/build/11009/?externalPlugins=babel-plugin-syntax-infix-bang).  The following code fragments can be used as input:
 
 ```
 x ! p(y, z, q)
@@ -147,6 +163,6 @@ x
 
 ## Caveats
 
-To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a *Promise* resolves to another *Promise*, but this change can be introduced in a later stage of this proposal while maintaining backward compatibility.
+To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a *Promise* resolves to another *Promise* for forwarding messages, but this change can be introduced in a later stage of this proposal while maintaining backward compatibility.
 
-It is worth noting that TypeScript has introduced postfix bang as a non-null assertion operator, which conflicts with our proposed usage (`x![a]` means assert `x` is not null, then return the `a` property).
+It is worth noting that TypeScript has introduced postfix bang as a [non-null assertion operator](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator), which conflicts with our proposed usage (`x![i]` tells the type system that `x` is not null, then evaluates to `x[i]`).
