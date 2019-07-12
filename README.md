@@ -1,4 +1,4 @@
-# Orthogonal Class Member Syntax
+# ECMAScript Infix Bang Syntax: Support for chaining Promises
 Proposed by Mark S. Miller (@erights) and Chip Morningstar (@FUDCo)
 
 Additional text by Michael FIG (@michaelfig)
