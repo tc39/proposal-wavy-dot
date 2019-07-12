@@ -20,7 +20,7 @@ TODO: Is bang inspired by the combination of a dot with a pipe?
 > In the following table, `Pr(x)` is shorthand for `Promise.resolve(x)`.  The proposed actual expansion uses `Promise.resolve(x)` directly.
 
 | Syntax	| Expansion	|
-|------- |--- | --- | --- |
+|------- | --- |
 | `x ! [i](y, z)`	| `Pr(x).post(i, [y, z])`	|
 | `x ! p(y, z)` |	`Pr(x).post('p', [y, z])`	|
 | `x ! (y, z)`	 | `Pr(x).post(void 0, [y, z])`	|
