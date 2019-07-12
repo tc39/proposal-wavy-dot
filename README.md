@@ -17,13 +17,19 @@ In contrast to *async*/*await*, infix bang is designed to allow the convenient c
 
 TODO: Is bang inspired by the combination of a dot with a pipe?
 
-| Abstract Syntax	| Expansion	| Simple Case	| Expansion	| JSON/RESTful equiv |
-|------- | --- | --- | --- | --- |
-| `x ! [i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	| `x ! p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	| `POST https://...q=p {...}` |
-| `x ! (y, z)`	 | `Promise.resolve(x).post(undefined, [y, z])`	| -	 | - |	`POST https://... {...}` |
-| `x ! [i]`	| `Promise.resolve(x).get(i)` |	`x ! p`	| `Promise.resolve(x).get('p')` |	`GET https://...q=p` |
-| `x ! [i] = v`	| `Promise.resolve(x).put(i, v)` |	`x ! p = v`	| `Promise.resolve(x).put('p', v)` | `PUT https://...q=p {...}` |
-| `delete x ! [i]` |	`Promise.resolve(x).delete(i)` | `delete x ! p`	| `Promise.resolve(x).delete('p')`	| `DELETE https://...q=p` |
+> In the following table, `Pr(x)` is shorthand for `Promise.resolve(x)`.  The proposed actual expansion uses `Promise.resolve(x)` directly.
+
+| Syntax	| Expansion	|
+|------- |--- | --- | --- |
+| `x ! [i](y, z)`	| `Pr(x).post(i, [y, z])`	|
+| `x ! p(y, z)` |	`Pr(x).post('p', [y, z])`	|
+| `x ! (y, z)`	 | `Pr(x).post(void 0, [y, z])`	|
+| `x ! [i]`	| `Pr(x).get(i)` |
+|	`x ! p`	| `Pr(x).get('p')` |
+| `x ! [i] = v`	| `Pr(x).put(i, v)` |
+| `x ! p = v`	| `Pr(x).put('p', v)` |
+| `delete x ! [i]` |	`Pr(x).delete(i)` |
+| `delete x ! p`	| `Pr(x).delete('p')`	|
 
 ### Default meaning
 
@@ -31,7 +37,7 @@ In the absence of *handled Promises* (the **Handler Method** is described in the
 
 | Method | Default Behaviour | Handler Method |
 | --- | --- | --- |
-| `p.post(undefined, args)` | `p.then(o => o(...args))` | `h.POST(o, undefined, args)` |
+| `p.post(void 0, args)` | `p.then(o => o(...args))` | `h.POST(o, void 0, args)` |
 | `p.post(prop, args)` | `p.then(o => o[prop](...args))` | `h.POST(o, prop, args)` |
 | `p.get(prop)` | `p.then(o => o[prop])` | `h.GET(o, prop)` |
 | `p.put(prop, value)` | `p.then(o => (o\[prop] = value))` | `h.PUT(o, prop, value)` |
