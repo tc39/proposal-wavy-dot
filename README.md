@@ -17,19 +17,17 @@ In contrast to *async*/*await*, infix bang is designed to allow the convenient c
 
 TODO: Is bang inspired by the combination of a dot with a pipe?
 
-> In the following table, `Pr(x)` is shorthand for `Promise.resolve(x)`.  The proposed actual expansion uses `Promise.resolve(x)` directly.
-
 | Syntax	| Expansion	|
 |------- | --- |
-| `x ! [i](y, z)`	| `Pr(x).post(i, [y, z])`	|
-| `x ! p(y, z)` |	`Pr(x).post('p', [y, z])`	|
-| `x ! (y, z)`	 | `Pr(x).post(void 0, [y, z])`	|
-| `x ! [i]`	| `Pr(x).get(i)` |
-|	`x ! p`	| `Pr(x).get('p')` |
-| `x ! [i] = v`	| `Pr(x).put(i, v)` |
-| `x ! p = v`	| `Pr(x).put('p', v)` |
-| `delete x ! [i]` |	`Pr(x).delete(i)` |
-| `delete x ! p`	| `Pr(x).delete('p')`	|
+| `x ! [i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	|
+| `x ! p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	|
+| `x ! (y, z)`	 | `Promise.resolve(x).post(void 0, [y, z])`	|
+| `x ! [i]`	| `Promise.resolve(x).get(i)` |
+|	`x ! p`	| `Promise.resolve(x).get('p')` |
+| `x ! [i] = v`	| `Promise.resolve(x).put(i, v)` |
+| `x ! p = v`	| `Promise.resolve(x).put('p', v)` |
+| `delete x ! [i]` |	`Promise.resolve(x).delete(i)` |
+| `delete x ! p`	| `Promise.resolve(x).delete('p')`	|
 
 ### Default meaning
 
