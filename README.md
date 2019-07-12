@@ -47,24 +47,24 @@ In contrast to *async*/*await*, infix bang is designed to allow the convenient c
 
 Infix bang (*!*) is a proposed operator with the same precedence as dot (*.*), but cannot begin a new line so that automatic semicolon insertion does not change the interpretation of existing code that has prefix bangs (the *not* operator) in it without semicolons.
 
-The **Analogy** describes the similar synchronous operation on plain objects, with the **Proposed Syntax** introducing the eventual *Promise* operations.
-The *Promise.prototype* API additions needed for each **Expansion** are explained in the following section.
+The **Synchronous** column describes the similar synchronous operation on plain objects, while the **Eventual Syntax** introduces the proposed *Promise*-based eventual operations.
+The *Promise.prototype* API additions needed for each **Eventual Expansion** are explained in the following section.
 
-| Analogy | Proposed Syntax	| Proposed Expansion	|
+| Synchronous | Eventual Syntax	| Eventual Expansion	|
 |------- | --- | --- |
-| `t[i](y, z)` | `x![i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	|
-| `t.p(y, z)` | `x!p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	|
-| `t(y, z)` | `x!(y, z)`	 | `Promise.resolve(x).post(undefined, [y, z])`	|
-| `t[i]` | `x![i]`	| `Promise.resolve(x).get(i)` |
-|	`t.p` | `x!p`	| `Promise.resolve(x).get('p')` |
-| `t[i] = v` | `x![i] = v`	| `Promise.resolve(x).put(i, v)` |
-| `t.p = v` | `x!p = v`	| `Promise.resolve(x).put('p', v)` |
-| `delete t[i]` | `delete x![i]` |	`Promise.resolve(x).delete(i)` |
-| `delete t.p` | `delete x!p`	| `Promise.resolve(x).delete('p')`	|
+| `x[i](y, z)` | `x![i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	|
+| `x.p(y, z)` | `x!p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	|
+| `x(y, z)` | `x!(y, z)`	 | `Promise.resolve(x).post(undefined, [y, z])`	|
+| `x[i]` | `x![i]`	| `Promise.resolve(x).get(i)` |
+|	`x.p` | `x!p`	| `Promise.resolve(x).get('p')` |
+| `x[i] = v` | `x![i] = v`	| `Promise.resolve(x).put(i, v)` |
+| `x.p = v` | `x!p = v`	| `Promise.resolve(x).put('p', v)` |
+| `delete x[i]` | `delete x![i]` |	`Promise.resolve(x).delete(i)` |
+| `delete x.p` | `delete x!p`	| `Promise.resolve(x).delete('p')`	|
 
 ### Default Behaviour
 
-The proposed *Promise.prototype* API additions have the following behaviour.  In the examples below, `p` is a *Promise* and `t` is the resolution of that *Promise* (the **Handled Behaviour** is described in the next section):
+The proposed *Promise.prototype* API additions have the following behaviour.  In the examples below, `p` is a *Promise* and `t` is the resolution of that *Promise*.  The **Default Behaviour** implements the same basic effect as the **Synchronous** column in the previous section, but operates on a *Promise*.  The **Handled Behaviour** is described in the next section:
 
 | Method | Unhandled Behaviour | Handled Behaviour |
 | --- | --- | --- |
