@@ -63,9 +63,7 @@ The *Promise.prototype* API additions needed for each **Expansion** are explaine
 
 ### Default Behaviour
 
-In the absence of *handled Promises* (the **Handler Method** is described in the next section), the proposed *Promise.prototype* API additions have the following **Default Behaviour**.
-
-In the examples `p` is a *Promise* and `t` is the results of resolving that *Promise*:
+The proposed *Promise.prototype* API additions have the following behaviour.  In the examples below, `p` is a *Promise* and `t` is the resolution of that *Promise* (the **Handler Method** is described in the next section):
 
 | Method | Default Behaviour | Handler Method |
 | --- | --- | --- |
