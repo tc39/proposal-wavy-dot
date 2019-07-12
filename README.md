@@ -69,7 +69,7 @@ The default resolve behaviour is to use the same handler that is assigned to `ta
 
 #### Promise Pipelining
 
-TODO: Explain the mechanism, and how it would be done by coordinating unfulfilledHandler with fulfilledHandler.
+The [Promise pipelining](http://www.erights.org/elib/distrib/pipeline.html) mechanism allows enqueuing messages and immediately returning references that correspond to their results, without a network round trip.  *Handled Promises* are designed specifically to allow transparent implementation of this mechanism.
 
 ### Proposed Syntax
 
@@ -142,5 +142,7 @@ x
 ```
 
 ## Caveats
+
+To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a *Promise* resolves to another *Promise*, but this change can be introduced in a later stage of this proposal while maintaining backward compatibility.
 
 It is worth noting that TypeScript has introduced postfix bang as a non-null assertion operator, which conflicts with our proposed usage (`x![a]` means assert `x` is not null, then return the `a` property).
