@@ -47,10 +47,10 @@ In contrast to *async*/*await*, infix bang is designed to allow the convenient c
 
 Infix bang (*!*) is a proposed operator with the same precedence as dot (*.*), but cannot begin a new line so that automatic semicolon insertion does not change the interpretation of existing code that has prefix bangs (the *not* operator) in it without semicolons.
 
-The **Synchronous Syntax** column describes the analogous synchronous operation on plain objects, while the **Eventual Syntax** introduces the proposed *Promise*-based eventual operations.
-The *Promise.prototype* API additions needed for each **Eventual Expansion** are explained in the following section.
+The **Synchronous Syntax** column describes the analogous synchronous operation on plain objects, while the **Promise Syntax** introduces the proposed *Promise*-based operations.
+The *Promise.prototype* API additions needed for each **Promise Expansion** are explained in the following section.
 
-| Synchronous Syntax | Eventual Syntax	| Eventual Expansion	|
+| Synchronous Syntax | Promise Syntax	| Promise Expansion	|
 |------- | --- | --- |
 | `x[i](y, z)` | `x![i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	|
 | `x.p(y, z)` | `x!p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	|
@@ -150,8 +150,8 @@ Abstract Syntax:
 
 ```
  Expression : ...
-      Expression ! [ Expression ] Arguments    // eventual send
-      Expression ! Arguments                   // eventual call
+      Expression ! [ Expression ] Arguments    // eventual post
+      Expression ! Arguments                   // eventual post
       Expression ! [ Expression ]              // eventual get
       Expression ! [ Expression ] = Expression // eventual put
       delete Expression ! [ Expression ]       // eventual delete
