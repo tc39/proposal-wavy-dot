@@ -19,17 +19,17 @@ TODO: Is bang inspired by the combination of a dot with a pipe?
 
 | Abstract Syntax	| Expansion	| Simple Case	| Expansion	| JSON/RESTful equiv |
 |------- | --- | --- | --- | --- |
-| x ! \[i](y, z)	| Promise.resolve(x).post(i, [y, z])	| x ! p(y, z) |	Promise.resolve(x).post('p', [y, z])	| POST https://...q=p {...} |
-| x ! (y, z)	 | Promise.resolve(x).post(undefined, [y, z])	| -	 | - |	POST https://... {...} |
-| x ! \[i]	| Promise.resolve(x).get(i) |	x ! p	| Promise.resolve(x).get('p') |	GET https://...q=p |
-| x ! \[i] = v	| Promise.resolve(x).put(i, v) |	x ! p = v	| Promise.resolve(x).put('p', v) |	UT https://...q=p {...} |
-| delete x ! \[i] |	Promise.resolve(x).delete(i) | delete x ! p	| Promise.resolve(x).delete('p')	| DELETE https://...q=p |
+| `x ! [i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	| `x ! p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	| `POST https://...q=p {...}` |
+| `x ! (y, z)`	 | `Promise.resolve(x).post(undefined, [y, z])`	| -	 | - |	`POST https://... {...}` |
+| `x ! [i]`	| `Promise.resolve(x).get(i)` |	`x ! p`	| `Promise.resolve(x).get('p')` |	`GET https://...q=p` |
+| `x ! [i] = v`	| `Promise.resolve(x).put(i, v)` |	`x ! p = v`	| `Promise.resolve(x).put('p', v)` | `PUT https://...q=p {...}` |
+| `delete x ! [i]` |	`Promise.resolve(x).delete(i)` | `delete x ! p`	| `Promise.resolve(x).delete('p')`	| `DELETE https://...q=p` |
 
 ### Default meaning
 
-In the absence of *handled Promises* (the **Handler Operation** is described below), the above *Promise.prototype* methods have the following behaviour:
+In the absence of *handled Promises* (the **Handler Method** is described in the next section), the above *Promise.prototype* methods have the following behaviour:
 
-| Method | Definition | Handler Operation |
+| Method | Definition | Handler Method |
 | --- | --- | --- |
 | p.post(undefined, args) | p.then(o => o(...args)) | h.POST(o, undefined, args) |
 | p.post(prop, args) | p.then(o => o\[prop](...args)) | h.POST(o, prop, args) |
@@ -39,12 +39,10 @@ In the absence of *handled Promises* (the **Handler Operation** is described bel
 
 ### Handled Promises
 
-In a manner analogous to *Proxy* handlers, a *Promise* can be associated with a handler object that overrides its normal unhandled behaviour.  A *handled Promise* is constructed via *Promise.makeHandled()*:
+In a manner analogous to *Proxy* handlers, a *Promise* can be associated with a handler object that provides **Handler Methods** to override its normal unhandled behaviour.  A *handled Promise* is constructed via *Promise.makeHandled()*:
 
 ```js
 const handler = {
-  // All of these methods are optional, defaulting
-  // to the unhandled implementation.
   GET(o, prop) { ... },
   POST(o, prop, args) { ... },
   PUT(o, prop, value) { ... },
@@ -58,11 +56,11 @@ const executor = (resolve, reject) => {
   resolve(target, fulfilledHandler); 
 };
 
-// Create a Promise for a target, whose handler queues
+// Create a Promise resolving to a target, whose handler queues
 // operations that are replayed when the executor fulfills it.
 const targetP = Promise.makeHandled(executor);
 
-// Create a Promise for a target, whose handler is
+// Create a Promise resolving to a target, whose handler is
 // unfulfilledHandler until the executor fulfills it.
 const targetP = Promise.makeHandled(executor, unfulfilledHandler);
 ```
