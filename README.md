@@ -114,7 +114,35 @@ Attempted Concrete Syntax:
 
 “[nlth]” above is short for “[No LineTerminator here]“, in order to unambiguously distinguish infix from prefix bang in the face of automatic semicolon insertion.
 
+## Implementation
+
+There is a [shim for the proposed *Promise* API additions](https://github.com/Agoric/eventual-send).
+
+You can experiment with the infix bang syntax desugaring in the [Infix Bang REPL](https://babeljs.io/repl/build/11009/?externalPlugins=babel-plugin-syntax-infix-bang).
+
+The following code fragments are useful for elucidation:
+
+```
+x ! p(y, z, q)
+x![i](y, z)
+x!(y, z)
+x!()
+x!p
+x![i]
+x!p = v
+x![i] = v
+delete x!p
+delete x![i]
+
+x!
+  p
+// No automatic semicolon insertion.
+
+x  
+  /* foo */ !p
+// Automatic semicolon insertion.
+```
 
 ## Caveats
 
-It is worth noting that TypeScript has introduced postfix bang as a non-null assertion operator, which conflicts with our proposed usage (`x![a]` means assert `x` is not null, and return the `a` member).
+It is worth noting that TypeScript has introduced postfix bang as a non-null assertion operator, which conflicts with our proposed usage (`x![a]` means assert `x` is not null, then return the `a` property).
