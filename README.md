@@ -9,7 +9,7 @@ This proposal introduces the infix bang syntax, with simple semantics integrated
 
 ## Details
 
-In contrast to *async*/*await*, infix bang is designed to allow the convenient chaining of *Promises* without interrupting evaluation.  The specific mechanism used by infix bang allows us to implement remote network protocols taking advantage of *Promise Pipelining*
+In contrast to *async*/*await*, infix bang is designed to allow the convenient chaining of *Promises* without interrupting evaluation.  The specific mechanism used by infix bang allows us to implement remote network protocols taking advantage of *Promise Pipelining*.
 
 ### Infix Bang
 
@@ -77,10 +77,13 @@ const handler = {
 };
 
 const executorFulfilled = (resolve, reject) => {
-  setTimeout(() => resolve(target, handler), 1000);
-  // Resolve the promise with target and associate handler with it.
+  setTimeout(() => {
+    // Resolve the target Promise with target and continue to associate handler with it.
+    resolve(target, handler);
+  }, 1000);
 };
 
+// Create an unfulfilled target Promise, associated with the handler.
 const targetP = Promise.makeHandled(executorFulfilled, handler);
 
 targetP!foo(a, b, c) // results in: queueMessage(slot, 'foo', [a, b, c]);
@@ -92,6 +95,10 @@ If the *handler* (second argument) is not specified to `resolve`, the handler is
 #### Promise Pipelining
 
 The [Promise pipelining](http://www.erights.org/elib/distrib/pipeline.html) mechanism allows enqueuing messages and immediately returning references that correspond to their results, without a network round trip.  *Handled Promises* are designed specifically to allow transparent implementation of this mechanism.
+
+In the above example, the `queueMessage` function would decide how and when to send messages destined for a slot.  Even if the slot's destination is not yet determined, the message can be enqueued for later delivery.  Once the destination is resolved (in the `executor`), the enqueued messages can be delivered, and further messages also can be handled by `queueMessage`.
+
+The implementation of `queueMessage` is left as an exercise for the reader.
 
 ### Proposed Syntax
 
@@ -163,6 +170,6 @@ x
 
 ## Caveats
 
-To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a *Promise* resolves to another *Promise* for forwarding messages, but this change can be introduced in a later stage of this proposal while maintaining backward compatibility.
+To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a *Promise* resolves to another *Promise*, so that messages destined for the prior *Promise* can be reenqueued for the new *Promise*.  This change can be introduced in a later stage of this proposal while maintaining backward compatibility.
 
-It is worth noting that TypeScript has introduced postfix bang as a [non-null assertion operator](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator), which conflicts with our proposed usage (`x![i]` tells the type system that `x` is not null, then evaluates to `x[i]`).
+It is worth noting that TypeScript has introduced postfix bang as a [non-null assertion operator](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator), which conflicts with our proposed usage.  In TypeScript, `x![i]` tells the type system that `x` is not null, then evaluates as `x[i]`.
