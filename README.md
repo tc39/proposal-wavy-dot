@@ -3,9 +3,41 @@ By Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael FIG (@micha
 
 **ECMAScript Infix Bang Syntax: Support for chaining Promises**
 ## Summary
-Since the inception of Promises in Javascript, they were planned to provide a convenient means to program distributed systems.  This paradigm had several previous implementations, but was most directly descended from Promises in our [E language](http://erights.org/).  An early [ECMAScript strawman concurrency proposal](https://web.archive.org/web/20161026162206/http://wiki.ecmascript.org/doku.php?id=strawman:concurrency) describes a simple desugaring of an infix bang (*!*) operator to allow chaining of *Promise* operations.  While Promises have achieved widespread popularity and now have language support (via *async*/*await*), the original intent for deadlock-free distributed concurrent programming in ECMAScript has languished.
+Promises in Javascript were proposed in 2011 at the [ECMAScript strawman
+concurrency
+proposal](https://web.archive.org/web/20161026162206/http://wiki.ecmascript.org/doku.php?id=strawman:concurrency).
+These promises descend from the [E language](http://erights.org/) via
+the [Waterken Q library](http://waterken.sourceforge.net/web_send/)
+and [Kris Kowal's Q library](https://github.com/kriskowal/q). A good
+early presentation is Tom Van Cutsem's [Communicating Event Loops: An
+exploration in
+Javascript](http://soft.vub.ac.be/~tvcutsem/talks/presentations/WGLD_CommEventLoops.pdf). All
+of these are about promises as a first step towards distributed
+computing, by using promises as asynchronous references to remote
+objects.
 
-This proposal introduces the infix bang syntax, with simple semantics integrated with extensions to the *Promise* API that are in line with modern ECMAScript.  Additionally, we explain the notion of a *handled Promise*, which extends a given *Promise* to implement different infix bang protocols in ECMAScript code.
+Kris Kowal's [Q-connection
+library](https://github.com/kriskowal/q-connection) extended Q's
+promises for distributed computing, essentially in the way we have in
+mind. However, in the absence of platform support for [Weak
+References](https://github.com/tc39/proposal-weakrefs), this approach
+was not practical. Given weak references, the [Midori
+project](http://joeduffyblog.com/2015/11/19/asynchronous-everything/),
+among others, demonstrates that this approach to distributed computing
+works well at scale.
+
+The old [ECMAScript strawman concurrency
+proposal](https://web.archive.org/web/20161026162206/http://wiki.ecmascript.org/doku.php?id=strawman:concurrency)
+also described a simple desugaring of an infix bang (*!*) operator to
+allow chaining of remote-able promise operations. This proposal
+reintroduces the infix bang syntax, with simple semantics integrated
+with extensions to the `Promise` API.  We explain the notion of a
+*handled Promise*, which extends a given `Promise` to implement
+different infix bang behaviors. These mechanisms, together with weak
+references, enable writing remote object communications systems, but
+they are not specific to any one. This proposal does not include any
+specific usage of the mechanisms we propose, except as a motivating
+example and test of adequacy.
 
 ## Details
 
@@ -13,35 +45,42 @@ In contrast to *async*/*await*, infix bang is designed to allow the convenient c
 
 ### Infix Bang
 
-Infix bang (*!*) is a proposed operator with the same precedence as dot (*.*), but cannot begin a new line so that automatic semicolon insertion does not change the interpretation of existing code that has prefix bangs in it without semicolons.
+Infix bang (*!*) is a proposed operator with the same precedence as dot (*.*), but cannot begin a new line so that automatic semicolon insertion does not change the interpretation of existing code that has prefix bangs (the *not* operator) in it without semicolons.
+
+The *Promise.prototype* API additions needed for each **Expansion** are explained in the following section.
 
 | Syntax	| Expansion	|
 |------- | --- |
-| `x ! [i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	|
-| `x ! p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	|
-| `x ! (y, z)`	 | `Promise.resolve(x).post(void 0, [y, z])`	|
-| `x ! [i]`	| `Promise.resolve(x).get(i)` |
-|	`x ! p`	| `Promise.resolve(x).get('p')` |
-| `x ! [i] = v`	| `Promise.resolve(x).put(i, v)` |
-| `x ! p = v`	| `Promise.resolve(x).put('p', v)` |
-| `delete x ! [i]` |	`Promise.resolve(x).delete(i)` |
-| `delete x ! p`	| `Promise.resolve(x).delete('p')`	|
+| `x![i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	|
+| `x!p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	|
+| `x!(y, z)`	 | `Promise.resolve(x).post(undefined, [y, z])`	|
+| `x![i]`	| `Promise.resolve(x).get(i)` |
+|	`x!p`	| `Promise.resolve(x).get('p')` |
+| `x![i] = v`	| `Promise.resolve(x).put(i, v)` |
+| `x!p = v`	| `Promise.resolve(x).put('p', v)` |
+| `delete x![i]` |	`Promise.resolve(x).delete(i)` |
+| `delete x!p`	| `Promise.resolve(x).delete('p')`	|
 
 ### Default Behaviour
 
-In the absence of *handled Promises* (the **Handler Method** is described in the next section), the above *Promise.prototype* methods have the following behaviour:
+In the absence of *handled Promises* (the **Handler Method** is described in the next section), the proposed *Promise.prototype* API additions have the following **Default Behaviour**.
+
+In the examples `p` is a *Promise* and `t` is the results of resolving that *Promise*:
 
 | Method | Default Behaviour | Handler Method |
 | --- | --- | --- |
-| `p.post(void 0, args)` | `p.then(o => o(...args))` | `h.POST(o, void 0, args)` |
-| `p.post(prop, args)` | `p.then(o => o[prop](...args))` | `h.POST(o, prop, args)` |
-| `p.get(prop)` | `p.then(o => o[prop])` | `h.GET(o, prop)` |
-| `p.put(prop, value)` | `p.then(o => (o[prop] = value))` | `h.PUT(o, prop, value)` |
-| `p.delete(prop)` | `p.then(o => delete o[prop])` | `h.DELETE(o, prop)` |
+| `p.post(undefined, args)` | `p.then(t => t(...args))` | `h.POST(t, undefined, args)` |
+| `p.post(prop, args)` | `p.then(t => t[prop](...args))` | `h.POST(t, prop, args)` |
+| `p.get(prop)` | `p.then(t => t[prop])` | `h.GET(t, prop)` |
+| `p.put(prop, value)` | `p.then(t => (t[prop] = value))` | `h.PUT(t, prop, value)` |
+| `p.delete(prop)` | `p.then(t => delete t[prop])` | `h.DELETE(t, prop)` |
+| `p.invoke(optKey, ...args)` | `p.post(optKey, args)` | (`post` shorthand only) |
+| `p.fapply(args)` | `p.post(undefined, args)` | (`post` shorthand only) |
+| `p.fcall(...args)` | `p.post(undefined, args)` | (`post` shorthand only) |
 
 ### Handled Promises
 
-In a manner analogous to *Proxy* handlers, a *Promise* can be associated with a handler object that provides **Handler Methods** to override its normal unhandled behaviour.  This handler is not exposed to the user of the *handled Promise*, so it provides a barrier between user mode (where the infix bang syntax is used) and system mode (which implements the communication mechanism).
+In a manner analogous to *Proxy* handlers, a *Promise* can be associated with a handler object that provides **Handler Methods** to override its normal unhandled behaviour.  This handler is not exposed to the user of the *handled Promise*, so it provides a secure separation between user mode (where the infix bang syntax is used) and system mode (which implements the communication mechanism).
 
 A *handled Promise* is constructed via *Promise.makeHandled()*:
 
@@ -72,8 +111,7 @@ const handler = {
   POST(o, prop, args) {
     return queueMessage(slot, prop, args);
   },
-  PUT(o, prop, value) { ... },
-  DELETE(o, prop) { ... },
+  // Unimplemented handler methods throw errors if invoked.
 };
 
 const executorFulfilled = (resolve, reject) => {
@@ -90,7 +128,7 @@ targetP!foo(a, b, c) // results in: queueMessage(slot, 'foo', [a, b, c]);
 targetP!foo!(a, b, c) // same
 ```
 
-If the *handler* (second argument) is not specified to `resolve`, the handler is the same one that has previously been assigned to `target`, or else as described in the **Default Behaviour** section.
+If the *handler* (second argument) is not specified to `resolve`, the handler is the same one that has previously been assigned to `target`, or else as described in the **Default Behaviour** section.  If a *handler* does not implement a **Handler Method**, then a *TypeError* is thrown if the client code calls a method that relies on it.
 
 #### Promise Pipelining
 
@@ -98,11 +136,7 @@ The [Promise pipelining](http://www.erights.org/elib/distrib/pipeline.html) mech
 
 In the above example, the `queueMessage` function would decide how and when to send messages destined for a slot.  Even if the slot's destination is not yet determined, the message can be enqueued for later delivery.  Once the destination is resolved (in the `executor`), the enqueued messages can be delivered, and further messages also can be handled by `queueMessage`.
 
-The implementation of `queueMessage` is left as an exercise for the reader.
-
 ### Proposed Syntax
-
-TODO: Rewrite in the standard way.
 
 Abstract Syntax:
 
@@ -139,16 +173,16 @@ Attempted Concrete Syntax:
       CallExpression [nlth] ! IdentifierName
 ```
 
-“[nlth]” above is short for “[No LineTerminator here]“, in order to unambiguously distinguish infix from prefix bang in the face of automatic semicolon insertion.
+`[nlth]` above is short for "[No LineTerminator here]", in order to unambiguously distinguish infix from prefix bang in the face of automatic semicolon insertion.
 
 ## Implementation
 
-There is a [shim for the proposed *Promise* API additions](https://github.com/Agoric/eventual-send).
+There is a [shim for the proposed *Promise* API additions](https://github.com/Agoric/eventual-send), which makes it possible to use the expanded forms needed for infix bang, but not the infix bang syntax itself.
 
 You can experiment with the infix bang syntax desugaring in the [Infix Bang REPL](https://babeljs.io/repl/build/11009/?externalPlugins=babel-plugin-syntax-infix-bang).  The following code fragments can be used as input:
 
 ```
-x ! p(y, z, q)
+x!p(y, z, q)
 x![i](y, z)
 x!(y, z)
 x!()
