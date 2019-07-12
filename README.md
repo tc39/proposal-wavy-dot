@@ -64,9 +64,9 @@ The *Promise.prototype* API additions needed for each **Eventual Expansion** are
 
 ### Default Behaviour
 
-The proposed *Promise.prototype* API additions have the following behaviour.  In the examples below, `p` is a *Promise* and `t` is the resolution of that *Promise*.  The **Default Behaviour** implements the same basic effect as the **Synchronous** column in the previous section, but operates on a *Promise*.  The **Handled Behaviour** is described in the next section:
+The proposed *Promise.prototype* API additions have the following behaviour.  In the examples below, `p` is a *Promise* and `t` is the resolution of that *Promise*.  The **Default Behaviour** implements the same basic effect as the **Synchronous Syntax** column in the previous section, but operates on a *Promise*.  The **Handled Behaviour** is described in the next section:
 
-| Method | Unhandled Behaviour | Handled Behaviour |
+| Method | Default Behaviour | Handled Behaviour |
 | --- | --- | --- |
 | `p.post(undefined, args)` | `p.then(t => t(...args))` | `h.POST(t, undefined, args)` |
 | `p.post(prop, args)` | `p.then(t => t[prop](...args))` | `h.POST(t, prop, args)` |
