@@ -29,13 +29,13 @@ TODO: Is bang inspired by the combination of a dot with a pipe?
 
 In the absence of *handled Promises* (the **Handler Method** is described in the next section), the above *Promise.prototype* methods have the following behaviour:
 
-| Method | Definition | Handler Method |
+| Method | Default Behaviour | Handler Method |
 | --- | --- | --- |
-| p.post(undefined, args) | p.then(o => o(...args)) | h.POST(o, undefined, args) |
-| p.post(prop, args) | p.then(o => o\[prop](...args)) | h.POST(o, prop, args) |
-| p.get(prop) | p.then(o => o\[prop]) | h.GET(o, prop) |
-| p.put(prop, value) | p.then(o => (o\[prop] = value)) | h.PUT(o, prop, value) |
-| p.delete(prop) | p.then(o => delete o\[prop]) | h.DELETE(o, prop) |
+| `p.post(undefined, args)` | `p.then(o => o(...args))` | `h.POST(o, undefined, args)` |
+| `p.post(prop, args)` | `p.then(o => o[prop](...args))` | `h.POST(o, prop, args)` |
+| `p.get(prop)` | `p.then(o => o[prop])` | `h.GET(o, prop)` |
+| `p.put(prop, value)` | `p.then(o => (o\[prop] = value))` | `h.PUT(o, prop, value)` |
+| `p.delete(prop)` | `p.then(o => delete o\[prop])` | `h.DELETE(o, prop)` |
 
 ### Handled Promises
 
