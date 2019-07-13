@@ -22,9 +22,10 @@ promises for distributed computing, essentially in the way we have in
 mind. However, in the absence of platform support for [Weak
 References](https://github.com/tc39/proposal-weakrefs), this approach
 was not practical. Given weak references, the [Midori
-project](http://joeduffyblog.com/2015/11/19/asynchronous-everything/),
-among others, demonstrates that this approach to distributed computing
-works well at scale.
+project](http://joeduffyblog.com/2015/11/19/asynchronous-everything/)
+and [Cap'n Proto](https://capnproto.org/rpc.html), among others,
+demonstrates that this approach to distributed computing works well at
+scale.
 
 The old [ECMAScript strawman concurrency
 proposal](https://web.archive.org/web/20161026162206/http://wiki.ecmascript.org/doku.php?id=strawman:concurrency)
@@ -64,7 +65,7 @@ The *Promise.prototype* API additions needed for each **Promise Expansion** are 
 
 ### Default Behaviour
 
-The proposed *Promise.prototype* API additions have the following behaviour.  In the examples below, `p` is a *Promise* and `t` is the resolution of that *Promise*.  The **Default Behaviour** implements the same basic effect as the **Synchronous Syntax** column in the previous section, but operates on a *Promise*.  The **Handled Behaviour** is described in the next section:
+The proposed *Promise.prototype* API additions have the following behaviour.  In the examples below, `p` is a promise and `t` is the resolution of that promise.  The **Default Behaviour** implements the same basic effect as the **Synchronous Syntax** column in the previous section, but operates on a promise.  The **Handled Behaviour** is described in the next section:
 
 | Method | Default Behaviour | Handled Behaviour |
 | --- | --- | --- |
@@ -79,7 +80,7 @@ The proposed *Promise.prototype* API additions have the following behaviour.  In
 
 ### Handled Promises
 
-In a manner analogous to *Proxy* handlers, a *Promise* can be associated with a handler object that provides handler methods (`POST`, `GET`, `PUT`, and `DELETE`) as described in the previous section, to override its normal unhandled behaviour.  A *handled Promise* is constructed via:
+In a manner analogous to *Proxy* handlers, a promise can be associated with a handler object that provides handler methods (`POST`, `GET`, `PUT`, and `DELETE`) as described in the previous section, to override its normal unhandled behaviour.  A *handled Promise* is constructed via:
 
 ```js
 // create a handled promise with initial handler:
@@ -212,6 +213,6 @@ x
 
 ## Caveats
 
-To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a *Promise* resolves to another *Promise*, so that messages destined for the prior *Promise* can be reenqueued for the new *Promise*.  This change can be introduced in a later stage of this proposal while maintaining backward compatibility.
+To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a promise resolves to another promise, so that messages destined for the prior promise can be reenqueued for the new promise.  This change can be introduced in a later stage of this proposal while maintaining backward compatibility.
 
 It is worth noting that TypeScript has introduced postfix bang as a [non-null assertion operator](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator), which partially conflicts with our proposed usage.  In TypeScript, `x![i]` tells the type system that `x` is not null, then evaluates as `x[i]`.  The ECMAScript [optional chaining proposal](https://github.com/TC39/proposal-optional-chaining) may mitigate the need for non-null assertion in that circumstance, with `x?.[i]` syntax.
