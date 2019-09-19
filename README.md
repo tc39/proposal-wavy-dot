@@ -1,7 +1,7 @@
-# ECMAScript Infix Bang Syntax: Support for chaining Promises
+# ECMAScript Wavy Dot Syntax: Support for chaining Promises
 By Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael FIG (@michaelfig)
 
-**ECMAScript Infix Bang Syntax: Support for chaining Promises**
+**ECMAScript Wavy Dot Syntax: Support for chaining Promises**
 ## Summary
 Promises in Javascript were proposed in 2011 at the [ECMAScript strawman
 concurrency
@@ -30,11 +30,11 @@ scale.
 The old [ECMAScript strawman concurrency
 proposal](https://web.archive.org/web/20161026162206/http://wiki.ecmascript.org/doku.php?id=strawman:concurrency)
 also described a simple desugaring of an infix bang (*!*) operator to
-allow chaining of remote-able promise operations. This proposal
-reintroduces the infix bang syntax, with simple semantics integrated
+allow chaining of remote-able promise operations. To avoid conflict with TypeScript, this proposal
+instead introduces the wavy dot syntax (*~.*) syntax, with simple semantics integrated
 with extensions to the `Promise` API.  We explain the notion of a
 *handled Promise*, which extends a given `Promise` to implement
-different infix bang behaviors. These mechanisms, together with weak
+different wavy dot behaviors. These mechanisms, together with weak
 references, enable writing remote object communications systems, but
 they are not specific to any one. This proposal does not include any
 specific usage of the mechanisms we propose, except as a motivating
@@ -42,26 +42,26 @@ example and test of adequacy.
 
 ## Details
 
-In contrast to *async*/*await*, infix bang is designed to allow the convenient chaining of *Promises* without interrupting evaluation.  The specific mechanism used by infix bang allows us to implement remote network protocols taking advantage of *Promise Pipelining*.
+In contrast to *async*/*await*, wavy dot is designed to allow the convenient chaining of *Promises* without interrupting evaluation.  The specific mechanism used by wavy dot allows us to implement remote network protocols taking advantage of *Promise Pipelining*.
 
-### Infix Bang
+### Wavy Dot
 
-Infix bang (*!*) is a proposed operator with the same precedence as dot (*.*), but cannot begin a new line so that automatic semicolon insertion does not change the interpretation of existing code that has prefix bangs (the *not* operator) in it without semicolons.
+Wavy dot (*~.*) is a proposed operator with the same precedence as dot (*.*), but cannot begin a new line so that automatic semicolon insertion does not change the interpretation of existing code that has prefix bangs (the *not* operator) in it without semicolons.
 
 The **Synchronous Syntax** column describes the analogous synchronous operation on plain objects, while the **Promise Syntax** introduces the proposed *Promise*-based operations.
 The *Promise.prototype* API additions needed for each **Promise Expansion** are explained in the following section.
 
 | Synchronous Syntax | Promise Syntax	| Promise Expansion	|
 |------- | --- | --- |
-| `x[i](y, z)` | `x![i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	|
-| `x.p(y, z)` | `x!p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	|
-| `x(y, z)` | `x!(y, z)`	 | `Promise.resolve(x).post(undefined, [y, z])`	|
-| `x[i]` | `x![i]`	| `Promise.resolve(x).get(i)` |
-|	`x.p` | `x!p`	| `Promise.resolve(x).get('p')` |
-| `x[i] = v` | `x![i] = v`	| `Promise.resolve(x).put(i, v)` |
-| `x.p = v` | `x!p = v`	| `Promise.resolve(x).put('p', v)` |
-| `delete x[i]` | `delete x![i]` |	`Promise.resolve(x).delete(i)` |
-| `delete x.p` | `delete x!p`	| `Promise.resolve(x).delete('p')`	|
+| `x[i](y, z)` | `x ~. [i](y, z)`	| `Promise.resolve(x).post(i, [y, z])`	|
+| `x.p(y, z)` | `x ~. p(y, z)` |	`Promise.resolve(x).post('p', [y, z])`	|
+| `x(y, z)` | `x ~. (y, z)`	 | `Promise.resolve(x).post(undefined, [y, z])`	|
+| `x[i]` | `x ~. [i]`	| `Promise.resolve(x).get(i)` |
+|	`x.p` | `x ~. p`	| `Promise.resolve(x).get('p')` |
+| `x[i] = v` | `x ~. [i] = v`	| `Promise.resolve(x).put(i, v)` |
+| `x.p = v` | `x ~. p = v`	| `Promise.resolve(x).put('p', v)` |
+| `delete x[i]` | `delete x ~. [i]` |	`Promise.resolve(x).delete(i)` |
+| `delete x.p` | `delete x ~. p`	| `Promise.resolve(x).delete('p')`	|
 
 ### Default Behaviour
 
@@ -89,7 +89,7 @@ Promise.makeHandled((resolve, reject) => ..., handler);
 resolve(t, handler)
 ```
 
-This handler is not exposed to the user of the *handled Promise*, so it provides a secure separation between user mode (where the infix bang syntax is used) and system mode (which implements the communication mechanism).
+This handler is not exposed to the user of the *handled Promise*, so it provides a secure separation between user mode (where the wavy dot syntax is used) and system mode (which implements the communication mechanism).
 
 Below are some *handled Promise* examples:
 
@@ -108,8 +108,8 @@ const targetP = Promise.makeHandled(executorDefault);
 // These methods can run anytime before or after the targetP is fulfilled.
 // The default handler for makeHandled queues the messages until the fulfill.
 targetP.then(val => assert(val === 'some value'));
-targetP!length.then(len => assert(len === 10));
-targetP!concat(' foobar').then(val => assert(val === 'some value foobar'));
+targetP ~. length.then(len => assert(len === 10));
+targetP ~. concat(' foobar').then(val => assert(val === 'some value foobar'));
 
 ///////////////////////
 // Create a handled Promise that queues messages for a remote slot.
@@ -133,8 +133,8 @@ const executorFulfilled = (resolve, reject) => {
 // Create an unfulfilled target Promise, associated with the handler.
 const targetP = Promise.makeHandled(executorFulfilled, handler);
 
-targetP!foo(a, b, c) // results in: queueMessage(slot, 'foo', [a, b, c]);
-targetP!foo!(a, b, c) // same
+targetP ~. foo(a, b, c) // results in: queueMessage(slot, 'foo', [a, b, c]);
+targetP ~. foo ~. (a, b, c) // same
 ```
 
 If the *handler* (second argument) is not specified to `resolve`, the handler is the same one that has previously been assigned to `target`, or else as described in the **Default Behaviour** section.  If a *handler* does not implement a **Handler Method**, then a *TypeError* is thrown if the client code calls a method that relies on it.
@@ -151,68 +151,59 @@ Abstract Syntax:
 
 ```
  Expression : ...
-      Expression ! [ Expression ] Arguments    // eventual post
-      Expression ! Arguments                   // eventual post
-      Expression ! [ Expression ]              // eventual get
-      Expression ! [ Expression ] = Expression // eventual put
-      delete Expression ! [ Expression ]       // eventual delete
+      Expression ~. [ Expression ] Arguments    // eventual post
+      Expression ~. Arguments                   // eventual post
+      Expression ~. [ Expression ]              // eventual get
+      Expression ~. [ Expression ] = Expression // eventual put
+      delete Expression ~. [ Expression ]       // eventual delete
 ```
 
 Attempted Concrete Syntax:
 
 ```
   MemberExpression : ...
-      MemberExpression [nlth] ! [ Expression ]
-      MemberExpression [nlth] ! IdentifierName
+      MemberExpression ~. [ Expression ]
+      MemberExpression ~. IdentifierName
   CallExpression : ...
-      CallExpression [nlth] ! [ Expression ] Arguments
-      CallExpression [nlth] ! IdentifierName Arguments
-      MemberExpression [nlth] ! Arguments
-      CallExpression [nlth] ! Arguments
-      CallExpression [nlth] ! [ Expression ]
-      CallExpression [nlth] ! IdentifierName
+      CallExpression ~. [ Expression ] Arguments
+      CallExpression ~. IdentifierName Arguments
+      MemberExpression ~. Arguments
+      CallExpression ~. Arguments
+      CallExpression ~. [ Expression ]
+      CallExpression ~. IdentifierName
   UnaryExpression : ...
-      delete CallExpression [nlth] ! [ Expression ]
-      delete CallExpression [nlth] ! IdentifierName
+      delete CallExpression ~. [ Expression ]
+      delete CallExpression ~. IdentifierName
   LeftHandSideExpression :
       Identifier
       CallExpression [ Expression ]
       CallExpression . IdentifierName
-      CallExpression [nlth] ! [ Expression ]
-      CallExpression [nlth] ! IdentifierName
+      CallExpression ~. [ Expression ]
+      CallExpression ~. IdentifierName
 ```
-
-`[nlth]` above is short for "[No LineTerminator here]", in order to unambiguously distinguish infix from prefix bang in the face of automatic semicolon insertion.
 
 ## Implementation
 
-There is a [shim for the proposed *Promise* API additions](https://github.com/Agoric/eventual-send), which makes it possible to use the expanded forms needed for infix bang, but not the infix bang syntax itself.
+There is a [shim for the proposed *Promise* API additions](https://github.com/Agoric/eventual-send), which makes it possible to use the expanded forms needed for wavy dot, but not the wavy dot syntax itself.
 
-You can experiment with the infix bang syntax desugaring in the [Infix Bang REPL](https://babeljs.io/repl/build/11009/?externalPlugins=babel-plugin-syntax-infix-bang).  The following code fragments can be used as input:
+TODO: Fix the following REPL so it actually implements wavy dot instead of infix bang.
 
-```
-x!p(y, z, q)
-x![i](y, z)
-x!(y, z)
-x!()
-x!p
-x![i]
-x!p = v
-x![i] = v
-delete x!p
-delete x![i]
+You can experiment with the wavy dot syntax desugaring in the [Infix Bang REPL](https://babeljs.io/repl/build/11009/?externalPlugins=babel-plugin-syntax-infix-bang).  The following code fragments can be used as input:
 
-x!
-  p
-// No automatic semicolon insertion.
+```js
+x ~. p(y, z, q)
+x ~. [i](y, z)
+x ~. (y, z)
+x ~. ()
+x ~. p
+x ~. [i]
+x ~. p = v
+x ~. [i] = v
+delete x ~. p
+delete x ~. [i]
 
-x  
-  /* foo */ !p
-// Automatic semicolon insertion.
 ```
 
 ## Caveats
 
-To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a promise resolves to another promise, so that messages destined for the prior promise can be reenqueued for the new promise.  This change can be introduced in a later stage of this proposal while maintaining backward compatibility.
-
-It is worth noting that TypeScript has introduced postfix bang as a [non-null assertion operator](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator), which partially conflicts with our proposed usage.  In TypeScript, `x![i]` tells the type system that `x` is not null, then evaluates as `x[i]`.  The ECMAScript [optional chaining proposal](https://github.com/TC39/proposal-optional-chaining) may mitigate the need for non-null assertion in that circumstance, with `x?.[i]` syntax.
+To fully implement promise pipelining requires more support from the *handled Promises* API.  We will require at least one new hook to notify the handler when a promise resolves to another promise, so that messages destined for the prior promise can be re-enqueued for the new promise.  This change can be introduced in a later stage of this proposal while maintaining backward compatibility.
