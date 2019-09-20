@@ -2,7 +2,46 @@
 By Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael FIG (@michaelfig)
 
 **ECMAScript Wavy Dot Syntax: Support for chaining Promises**
-## Summary
+
+## Background
+
+Promises were invented in the late 1980s, originally as a technique for
+compensating for roundtrip latency in operations invoked remotely over a
+network, though promises have since proven valuable for dealing with all manner
+of asynchronous delays in computational systems.
+
+The fundamental insight behind promises is this: in the classic presentation of
+object oriented programming, an object is something that you can send messages
+to in order to invoke operations on it.  If the result of such an operation is
+another object, that result in turn is something that you can send messages to.
+If the operation initiated by a message send entails an asynchronous delay to
+get the result, rather than waiting (possibly for a long time) for the result
+to eventually become available, you can instead immediately return another
+object - a promise - that can stand in for the result in the meantime.  Since,
+as we said, an object is just something you send messages to, a promise is, in
+that respect, as good as the object it is a promise for -- you simply send it
+messages as if it was the actual result.  The promise can't perform the invoked
+operation directly, since what that means is not yet known, but it *can*
+enqueue the request for later processing or relay it to the other end of a
+network connection where the result will eventually be known.  This deferall of
+operations through enqueuing or relaying can be pipelined an arbitrary number
+of operations deep; it is only at the point where there is a semantic
+requirement to actually see the result (such as the need to display it to a
+human) that the pipeline must stall to await the final outcome.  Furthermore,
+the point at which waiting for a result is truly required can often be much
+later in a chain of computational activity than many people's intuitions lead
+them to expect.
+
+Since network latency is often the largest component of delay (by far) in a
+remotely invoked operation, the overlapping of network transmissions that
+promise pipelining makes possible can result an enormous overall improvement in
+throughput in distributed systems.  For example, implementations of promise
+pipelining for remote method invocation in the [Xanadu hypertext
+system][http://udanax.xanadu.com/gold/] and in Microsoft's [Midori operating
+system][http://joeduffyblog.com/2015/11/03/blogging-about-midori/] measured
+speedups of 10 to 1,000 over traditional synchronous RPC, depending on use
+case.
+
 Promises in Javascript were proposed in 2011 at the [ECMAScript strawman
 concurrency
 proposal](https://web.archive.org/web/20161026162206/http://wiki.ecmascript.org/doku.php?id=strawman:concurrency).
