@@ -46,7 +46,7 @@ In contrast to *async*/*await*, wavy dot is designed to allow the convenient cha
 
 ### Wavy Dot
 
-Wavy dot (*~.*) is a proposed operator with the same precedence as dot (*.*), but cannot begin a new line so that automatic semicolon insertion does not change the interpretation of existing code that has prefix bangs (the *not* operator) in it without semicolons.
+Wavy dot (*~.*) is a proposed operator with the same precedence as dot (*.*).
 
 The **Synchronous Syntax** column describes the analogous synchronous operation on plain objects, while the **Promise Syntax** introduces the proposed *Promise*-based operations.
 The *Promise.prototype* API additions needed for each **Promise Expansion** are explained in the following section.
@@ -162,24 +162,24 @@ Attempted Concrete Syntax:
 
 ```
   MemberExpression : ...
-      MemberExpression ~. [ Expression ]
-      MemberExpression ~. IdentifierName
+      MemberExpression ~ . [ Expression ]
+      MemberExpression ~ . IdentifierName
   CallExpression : ...
-      CallExpression ~. [ Expression ] Arguments
-      CallExpression ~. IdentifierName Arguments
-      MemberExpression ~. Arguments
-      CallExpression ~. Arguments
-      CallExpression ~. [ Expression ]
-      CallExpression ~. IdentifierName
+      CallExpression ~ . [ Expression ] Arguments
+      CallExpression ~ . IdentifierName Arguments
+      MemberExpression ~ . Arguments
+      CallExpression ~ . Arguments
+      CallExpression ~ . [ Expression ]
+      CallExpression ~ . IdentifierName
   UnaryExpression : ...
-      delete CallExpression ~. [ Expression ]
-      delete CallExpression ~. IdentifierName
+      delete CallExpression ~ . [ Expression ]
+      delete CallExpression ~ . IdentifierName
   LeftHandSideExpression :
       Identifier
       CallExpression [ Expression ]
       CallExpression . IdentifierName
-      CallExpression ~. [ Expression ]
-      CallExpression ~. IdentifierName
+      CallExpression ~ . [ Expression ]
+      CallExpression ~ . IdentifierName
 ```
 
 ## Implementation
