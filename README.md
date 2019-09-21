@@ -1,4 +1,4 @@
-# ECMAScript Wavy Dot: Syntactic Support for Promise Pipelining
+# Wavy Dot: Syntactic Support for Promise Pipelining
 By Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael FIG (@michaelfig)
 
 **ECMAScript Wavy Dot: Syntactic Support for Promise Pipelining**
