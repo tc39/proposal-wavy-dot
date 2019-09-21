@@ -15,7 +15,9 @@ instead introduces the wavy dot syntax (*~.*) syntax.
 
 ### Wavy Dot
 
-Like the (*?.*) of the [optional chaining proposal](https://tc39.es/proposal-optional-chaining/), wavy dot (*~.*) is a proposed infix operator with the same precedence as dot (*.*). Both can be understood as *adjective dot*, i.e., an operation that is dot-like, but differs according to the adjective. When the wavy dot expression occurs in a syntactic context in which the value of the expression might be used, the syntax has the following equivalences
+Like the (*?.*) of the [optional chaining proposal](https://tc39.es/proposal-optional-chaining/), wavy dot (*~.*) is a proposed infix operator with the same precedence as dot (*.*). Both can be understood as *adjective dot*, i.e., an operation that is dot-like, but differs according to the adjective. Once the optional chaining proposal is accepted, we will also propose an operator combining the two adjectives, such as (*?~.*) or (*~?.*). 
+
+When the wavy dot expression occurs in a syntactic context in which the value of the expression might be used, the syntax has the following equivalences
 
 | Syntax | Internal Method |
 | --- | --- |
