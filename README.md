@@ -1,7 +1,15 @@
-# Wavy Dot: Syntactic Support for Promise Pipelining
-By Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael FIG (@michaelfig)
+# proposal-wavy-dot
 
-**ECMAScript Wavy Dot: Syntactic Support for Promise Pipelining**
+## Pleasant Notation for Promise Pipelining
+
+by Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael FIG (@michaelfig)
+
+## Status
+
+Presented to TC39 (Javascript standards committee), achieving stage 1.
+
+[<img src="tildot-miniplayer.png" alt="Presentation to TC39" width="40%">](https://www.youtube.com/watch?v=ikyK3hUJsN8&list=PLzDw4TTug5O0ywHrOz4VevVTYr6Kj_KtW)
+
 ## Summary
 
 This is a follow on proposal to [proposal-eventual-send](https://github.com/Agoric/proposal-eventual-send), providing syntactic sugar for the APIs of that proposal.
