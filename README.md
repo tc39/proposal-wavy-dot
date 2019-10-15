@@ -10,7 +10,7 @@ Presented to TC39 (Javascript standards committee), achieving stage 1.
 
 [<img src="tildot-miniplayer.png" alt="Presentation to TC39" width="40%">](https://www.youtube.com/watch?v=ikyK3hUJsN8&list=PLzDw4TTug5O0ywHrOz4VevVTYr6Kj_KtW)
 
-[Slides](https://github.com/tc39/agendas/blob/master/2019/10.eventual-send-as-recorded.pdf)
+[Slides](https://github.com/tc39/agendas/blob/master/2019/10.eventual-op-as-recorded.pdf)
 
 ## Summary
 
