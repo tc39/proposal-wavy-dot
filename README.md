@@ -2,7 +2,7 @@
 
 ## Pleasant Notation for Promise Pipelining
 
-by Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael FIG (@michaelfig)
+by Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael Fig (@michaelfig)
 
 ## Status
 
@@ -32,14 +32,10 @@ When the wavy dot expression occurs in a syntactic context in which the value of
 | Syntax | Internal Method |
 | --- | --- |
 | `p ~. name` | `p.[[GetSend]]('name')` |
-| `p ~. name = value` | `p.[[SetSend]]('name', value)` |
-| `delete p ~. name` | `p.[[DeleteSend]]('name')` |
-| `p ~. (...args)` | `p.[[ApplySend]](args)` |
+| `p ~. (...args)` | `p.[[ApplyFunctionSend]](args)` |
 | `p ~. name(...args)` | `p.[[ApplyMethodSend]]('name', args)`|
 | &nbsp; | &nbsp; |
 | `p ~. [prop]` | `p.[[GetSend]](prop)` |
-| `p ~. [prop] = value` | `p.[[SetSend]](prop, value)` |
-| `delete p ~. [prop]` | `p.[[DeleteSend]](prop)` |
 | `p ~. [prop](...args)` | `p.[[ApplyMethodSend]](prop, args)`|
 
 When the expression occurs in a syntactic context where the value of the expression is obviously ignored, such as an *ExpressionStatement*, the equivalences are as above, but using the [[\*SendOnly]] variant of these internal methods.
@@ -50,11 +46,9 @@ Abstract Syntax:
 
 ```
  Expression : ...
-      Expression ~. [ Expression ] Arguments    // eventual post
-      Expression ~. Arguments                   // eventual post
       Expression ~. [ Expression ]              // eventual get
-      Expression ~. [ Expression ] = Expression // eventual put
-      delete Expression ~. [ Expression ]       // eventual delete
+      Expression ~. Arguments                   // eventual apply function
+      Expression ~. [ Expression ] Arguments    // eventual apply method
 ```
 
 Attempted Concrete Syntax, where "..." signifies the existing productions of that non-terminal. Our intention is that this syntax follow the pattern of the [optional chaining proposal](https://tc39.es/proposal-optional-chaining/).
@@ -71,15 +65,6 @@ Attempted Concrete Syntax, where "..." signifies the existing productions of tha
       CallExpression WavyDot IdentifierName Arguments
       MemberExpression WavyDot Arguments
       CallExpression WavyDot Arguments
-      CallExpression WavyDot [ Expression ]
-      CallExpression WavyDot IdentifierName
-  UnaryExpression : ...
-      delete CallExpression WavyDot [ Expression ]
-      delete CallExpression WavyDot IdentifierName
-  LeftHandSideExpression :
-      Identifier
-      CallExpression [ Expression ]
-      CallExpression . IdentifierName
       CallExpression WavyDot [ Expression ]
       CallExpression WavyDot IdentifierName
 ```
