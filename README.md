@@ -31,14 +31,22 @@ When the wavy dot expression occurs in a syntactic context in which the value of
 
 | Syntax | Internal Method |
 | --- | --- |
-| `p ~. name` | `p.[[GetSend]]('name')` |
-| `p ~. (...args)` | `p.[[ApplyFunctionSend]](args)` |
-| `p ~. name(...args)` | `p.[[ApplyMethodSend]]('name', args)`|
+| `p~.name` | `p.[[GetSend]]('name')` |
+| `p~.[prop]` | `p.[[GetSend]](prop)` |
 | &nbsp; | &nbsp; |
-| `p ~. [prop]` | `p.[[GetSend]](prop)` |
-| `p ~. [prop](...args)` | `p.[[ApplyMethodSend]](prop, args)`|
+| `p~.(...args)` | `p.[[ApplyFunctionSend]](args)` |
+| &nbsp; | &nbsp; |
+| `p~.name(...args)` | `p.[[ApplyMethodSend]]('name', args)`|
+| `p~.[prop](...args)` | `p.[[ApplyMethodSend]](prop, args)`|
 
 When the expression occurs in a syntactic context where the value of the expression is obviously ignored, such as an *ExpressionStatement*, the equivalences are as above, but using the [[\*SendOnly]] variant of these internal methods.
+
+| Syntax | Internal Method |
+| --- | --- |
+| `void p~.(...args);` | `p.[[ApplyFunctionSendOnly]](args)` |
+| &nbsp; | &nbsp; |
+| `void p~.name(...args);` | `p.[[ApplyMethodSendOnly]]('name', args)`|
+| `void p~.[prop](...args);` | `p.[[ApplyMethodSendOnly]](prop, args)`|
 
 ### Proposed Syntax
 
