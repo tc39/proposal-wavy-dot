@@ -1,8 +1,10 @@
 # proposal-wavy-dot
 
-## Pleasant Notation for Promise Pipelining
+*Pleasant Notation for promise pipelining.*
 
-by Mark S. Miller (@erights), Chip Morningstar (@FUDCo), and Michael Fig (@michaelfig)
+   * Mark S. Miller @erights, Agoric
+   * Michael Fig @michaelfig, Agoric
+   * Chip Morningstar @FUDCo, Evernote
 
 ## Status
 
