@@ -3,13 +3,17 @@
   "private": true,
   "version": "independent",
   "workspaces": [
-    "packages/*"
+    "packages/babel-plugin*"
   ],
   "scripts": {
-    "build": "yarn workspaces run prepublish"
+    "build": "yarn workspaces run prepublish",
+    "babel": "babel"
   },
   "dependencies": {
     "@agoric/babel-parser": "^7.9.4",
     "@babel/cli": "^7.8.4"
+  },
+  "resolutions": {
+    "@babel/types": "file:packages/babel-types"
   }
 }

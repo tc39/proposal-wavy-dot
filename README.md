@@ -77,3 +77,11 @@ Attempted Concrete Syntax, where "..." signifies the existing productions of tha
 # Prototype
 
 A [Babel playground](https://babeljs.io/repl/build/11698/#?babili=false&browsers=&build=&builtIns=false&spec=false&loose=false&code_lz=B4PwdADgFAngNAAgF6II4EoBQowG0CWAurIkljicueFFgGYDcmmd24EbeRnECAvAgBunAoX5DMAEwCmAG2kAXaQhwcZ8pSvCjmOTAgQcA9EYQA5APYIAhgFcFFgLbWF-AMYIAztMfuLsiwA7BHxA7wAnVyCwXQN9BCMAKgQ6CytE03ZME3MrOwdnVw9vXzd_IJCw6Uj8aMwgA&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=es2015%2Creact%2Cstage-2&prettier=false&targets=&version=7.6.2%2Bpr.10115&externalPlugins=babel-plugin-syntax-eventual-send%407.6.2) implements this proposal using static methods on the `HandledPromise` object that is in the current scope.  The [Work-In-Progress Babel pull request for this syntax](https://github.com/babel/babel/pull/10115) is also available.
+
+To experiment with the Babel-based parser, you can do:
+
+```sh
+yarn install
+TARGET_GLOBAL=Promise yarn babel sample.js
+TARGET_GLOBAL=HandledPromise yarn babel sample.js
+```
