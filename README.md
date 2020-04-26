@@ -21,18 +21,18 @@ When the wavy dot expression occurs in a syntactic context in which the value of
 
 | Syntax | Internal Method |
 | --- | --- |
-| `p ~. name` | `p.[[GetSend]]('name')` |
-| `p ~. name = value` | `p.[[SetSend]]('name', value)` |
-| `delete p ~. name` | `p.[[DeleteSend]]('name')` |
-| `p ~. (...args)` | `p.[[ApplySend]](args)` |
-| `p ~. name(...args)` | `p.[[ApplyMethodSend]]('name', args)`|
+| `p ~. name` | `p.[[EventualGet]]('name')` |
+| `p ~. name = value` | `p.[[EventualSet]]('name', value)` |
+| `delete p ~. name` | `p.[[EventualDelete]]('name')` |
+| `p ~. (...args)` | `p.[[EventualApply]](args)` |
+| `p ~. name(...args)` | `p.[[EventualSend]]('name', args)`|
 | &nbsp; | &nbsp; |
-| `p ~. [prop]` | `p.[[GetSend]](prop)` |
-| `p ~. [prop] = value` | `p.[[SetSend]](prop, value)` |
-| `delete p ~. [prop]` | `p.[[DeleteSend]](prop)` |
-| `p ~. [prop](...args)` | `p.[[ApplyMethodSend]](prop, args)`|
+| `p ~. [prop]` | `p.[[EventualGet]](prop)` |
+| `p ~. [prop] = value` | `p.[[EventualSet]](prop, value)` |
+| `delete p ~. [prop]` | `p.[[EventualDelete]](prop)` |
+| `p ~. [prop](...args)` | `p.[[EventualSend]](prop, args)`|
 
-When the expression occurs in a syntactic context where the value of the expression is obviously ignored, such as an *ExpressionStatement*, the equivalences are as above, but using the [[\*SendOnly]] variant of these internal methods.
+When the expression occurs in a syntactic context where the value of the expression is obviously ignored, such as an *ExpressionStatement*, the equivalences are as above, but using the [[\*Only]] variant of these internal methods.
 
 ### Proposed Syntax
 
@@ -40,10 +40,10 @@ Abstract Syntax:
 
 ```
  Expression : ...
-      Expression ~. [ Expression ] Arguments    // eventual post
-      Expression ~. Arguments                   // eventual post
+      Expression ~. [ Expression ] Arguments    // eventual send
+      Expression ~. Arguments                   // eventual apply
       Expression ~. [ Expression ]              // eventual get
-      Expression ~. [ Expression ] = Expression // eventual put
+      Expression ~. [ Expression ] = Expression // eventual set
       delete Expression ~. [ Expression ]       // eventual delete
 ```
 

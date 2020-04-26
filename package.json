@@ -1,0 +1,15 @@
+{
+  "name": "proposal-wavy-dot",
+  "private": true,
+  "version": "independent",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run prepublish"
+  },
+  "dependencies": {
+    "@agoric/babel-parser": "^7.9.4",
+    "@babel/cli": "^7.8.4"
+  }
+}
