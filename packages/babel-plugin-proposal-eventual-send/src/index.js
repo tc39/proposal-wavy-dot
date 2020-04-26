@@ -6,6 +6,7 @@ const DEFAULT_TARGET_GLOBAL = 'HandledPromise';
 const targetGlobals = ['Promise', 'HandledPromise'];
 
 export default declare((api, options) => {
+  const { types } = api;
   api.assertVersion(7);
   const { targetGlobal = DEFAULT_TARGET_GLOBAL } = options;
 
@@ -21,6 +22,6 @@ export default declare((api, options) => {
   return {
     name: "proposal-eventual-send",
     inherits: syntaxEventualSend,
-    visitor: makeVisitor(targetGlobal),
+    visitor: makeVisitor(types, targetGlobal),
   };
 });

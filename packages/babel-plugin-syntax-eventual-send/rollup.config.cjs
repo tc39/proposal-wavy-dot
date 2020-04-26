@@ -1,7 +1,6 @@
 const babelSource = require('../../scripts/rollup-plugin-babel-source');
 const resolve = require('rollup-plugin-node-resolve');
 const commonJs = require('rollup-plugin-commonjs');
-const rollupJson = require("@rollup/plugin-json");
 
 module.exports = [{
   input: 'src/index.js',
@@ -9,7 +8,7 @@ module.exports = [{
     file: 'lib/index.js',
     format: 'cjs',
   },
-  plugins: [ babelSource(), resolve(), commonJs(), rollupJson()]
+  plugins: [ babelSource(), resolve(), commonJs()]
 }, {
   input: 'src/index.js',
   output: {
@@ -17,5 +16,5 @@ module.exports = [{
     format: 'umd',
     name: 'BabelPluginSyntaxEventualSend',
   },
-  plugins: [babelSource(), resolve(), commonJs(), rollupJson()],
+  plugins: [babelSource(), resolve(), commonJs()],
 }];

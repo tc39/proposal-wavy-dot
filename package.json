@@ -14,6 +14,6 @@
     "@babel/cli": "^7.8.4"
   },
   "resolutions": {
-    "@babel/types": "file:packages/babel-types"
+    "**/@babel/types": "file:packages/babel-types"
   }
 }

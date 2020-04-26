@@ -1,6 +1,4 @@
-import { types as t } from "@babel/core";
-
-function makeVisitor(targetGlobal = 'HandledPromise') {
+function makeVisitor(t, targetGlobal = 'HandledPromise') {
   return {
     EventualMemberExpression(path) {
       const { node } = path;
