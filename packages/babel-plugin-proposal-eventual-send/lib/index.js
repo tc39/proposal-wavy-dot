@@ -112,11 +112,12 @@ function makeVisitor(targetGlobal = 'HandledPromise') {
   };
 }
 
+const DEFAULT_TARGET_GLOBAL = 'HandledPromise';
 const targetGlobals = ['Promise', 'HandledPromise'];
 
 var index = helperPluginUtils.declare((api, options) => {
   api.assertVersion(7);
-  const { targetGlobal } = options;
+  const { targetGlobal = DEFAULT_TARGET_GLOBAL } = options;
 
   if (typeof targetGlobal !== "string" || !targetGlobals.includes(targetGlobal)) {
     throw new Error(
