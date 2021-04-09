@@ -1,5 +1,7 @@
 # proposal-wavy-dot
 
+![Stage 1](https://badges.aleen42.com/src/tc39_2.svg)
+
 *Pleasant Notation for promise pipelining.*
 
    * Mark S. Miller @erights, Agoric
